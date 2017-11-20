@@ -1,14 +1,8 @@
 import React, { Component } from 'react';
 import {
-  Route,
   Link,
-  Redirect,
-  Switch
 } from 'react-router-dom'
 import _ from 'lodash'
-
-// import logo from './logo.svg';
-// import './App.css';
 
 import axios from 'axios'
 
@@ -89,7 +83,7 @@ class SingleRepoView extends Component {
                         <Link to={{
                           pathname: `${match.url}/${commit.sha}`,
                           state: { commit }
-                        }}>{commit.sha}</Link>
+                        }}>{commit.commit.message}</Link>
                       </li>
                   )}
                   </ul>

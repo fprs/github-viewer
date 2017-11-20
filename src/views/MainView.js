@@ -1,13 +1,7 @@
 import React, { Component } from 'react';
 import {
-  Route,
-  Link,
-  Redirect,
-  Switch
+  Link
 } from 'react-router-dom'
-
-// import logo from './logo.svg';
-// import './App.css';
 
 import axios from 'axios'
 
@@ -40,7 +34,7 @@ class MainView extends Component {
   render () {
     const {
         props: { match },
-        state: { userRepositories: { data, error, fetching, downloaded } }
+        state: { userRepositories: { data, fetching } }
     } = this
     console.log(data, match, 'mainview')
     return (
