@@ -3,7 +3,8 @@ import {
   BrowserRouter as Router,
   Route,
   Link,
-  Switch
+  Switch,
+  Redirect
 } from 'react-router-dom'
 
 import logo from './logo.svg';
@@ -23,6 +24,7 @@ class App extends Component {
           <Switch>
             <Route path="/repos/:topicId" component={SingleRepoView}/>
             <Route path="/repos" component={MainView}/>
+            <Redirect from="/" to="/repos"/>
           </Switch>
         </div>
       </Router>

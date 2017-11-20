@@ -15,37 +15,46 @@ class MainView extends Component {
   constructor () {
     super()
     this.state = {
-      userRepositories: [],
-      downloaded: false,
-      fetching: false,
-      error: false
+      userRepositories: {
+        data: [],
+        downloaded: false,
+        fetching: false,
+        error: false
+      }
     }
   }
   componentWillMount () {
-    this.setState({ fetching: true })
+    this.setState({
+      userRepositories: { 
+        ...this.state.userRepositories,
+        fetching: true
+      }
+    })
   }
   componentDidMount () {
+    console.log(this.state, 'cdm')
     axios.get('https://api.github.com/user/repos', { headers: { Authorization: 'bearer 35205773164c8e6d20184bc7f898ebf3f3f907e6' } })
-      .then(res => this.setState({ userRepositories: res.data, downloaded: true, fetching: false }))
+      .then(res => this.setState({ userRepositories: { data: res.data, downloaded: true, fetching: false } }))
       .catch(error => this.setState({ error, fetching: false }))
   }
   render () {
     const {
         props: { match },
-        state: { userRepositories, error, fetching, downloaded }
+        state: { userRepositories: { data, error, fetching, downloaded } }
     } = this
-    console.log(userRepositories, match, 'mainview')
+    console.log(data, match, 'mainview')
     return (
       <div className="MainView">
         { fetching
           ? <p>Loading</p>
-          : userRepositories.length
+          : data.length
             ? <div><ul>
               {
-                userRepositories.map(repo =>
+                data.map(repo =>
                   <li key={repo.id}>
                     <Link to={{
-                      pathname: `${match.path}/${repo.full_name}`
+                      pathname: `${match.path}/${repo.owner.login}-${repo.name}`,
+                      state: { repo }
                     }}>{repo.name}</Link>
                   </li>
               )}
