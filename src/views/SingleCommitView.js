@@ -3,8 +3,9 @@ import {
   // Link,
 } from 'react-router-dom'
 import _ from 'lodash'
-
 import axios from 'axios'
+
+import '../App.css'
 
 class SingleCommitView extends Component {
   constructor () {
@@ -36,6 +37,11 @@ class SingleCommitView extends Component {
       .then(res => this.setState({ singleCommitData: { data: res.data, downloaded: true, fetching: false } }))
       .catch(error => this.setState({ singleCommitData: { error, fetching: false } }))
   }
+  styleCodeLine (firstChar) {
+    if (firstChar === '+') return '#dfd'
+    if (firstChar === '-') return '#fdd'
+    return 'none'
+  }
   render () {
     const {
         props: { match },
@@ -50,8 +56,27 @@ class SingleCommitView extends Component {
           commitsFetching
             ? <p>Loading commits</p>
             : !_.isEmpty(singleCommitData)
-              ? <div>
-                {singleCommitData.files.map(file => <p key={file.sha}>{file.filename}</p>)}
+              ? <div className="monospace">
+                {singleCommitData.files.map(file =>
+                  { 
+                    const patch = file.patch.replace(/ /g, '\u00a0').split('\n')
+                    console.log(patch, 'file')
+                    return (<div key={file.sha}>
+                      <h5>{file.filename}</h5>
+                      <div>
+                        {patch.map((line, i) =>
+                          <p
+                            key={`${file.filename}line${i}`}
+                            style={{ background: this.styleCodeLine(line[0]) }}
+                            className="codeline"
+                          >
+                            {line}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                )}
               </div>
               : <p>No commits data</p>
         }
