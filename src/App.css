@@ -34,3 +34,30 @@
 .codeline {
   margin: 0;
 }
+
+.prev-filename {
+  color: #666;
+  font-size: 0.83em;
+  margin: 0;
+}
+
+.singleFileContainer {
+  margin: 3% 0;
+}
+
+.singleFileContainer > div {
+  margin-top: 3%;
+}
+
+h5 {
+  margin: 0;
+  font-size: 1em;
+}
+
+.SingleRepoView > section {
+  margin: 5%;
+}
+
+.SingleRepoView > section > div {
+  margin: 5%;
+}

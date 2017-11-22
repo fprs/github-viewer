@@ -8,11 +8,12 @@ import axios from 'axios'
 import '../App.css'
 
 class SingleCommitView extends Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
+    const commit = _.get(props, ['location','state','commit'])
     this.state = {
       singleCommitData: {
-        data: [],
+        data: commit || [],
         downloaded: false,
         fetching: false,
         error: false
@@ -30,7 +31,7 @@ class SingleCommitView extends Component {
   }
   componentDidMount () {
     console.log(this.props, 'aaa')
-    const { props: { match: { params: { topicId, commitId } } } } = this
+    const { topicId, commitId } = this.props.match.params
     const [username, ...rest] = topicId.split('-')
     const projectname = rest.join('-')
     axios.get(`https://api.github.com/repos/${username}/${projectname}/commits/${commitId}`, { headers: { Authorization: 'bearer 35205773164c8e6d20184bc7f898ebf3f3f907e6' } })
@@ -52,33 +53,37 @@ class SingleCommitView extends Component {
     console.log(singleCommitData, match, 'singlerepo')
     return (
       <div className="SingleCommitView">
+        <h4>{singleCommitData && singleCommitData.commit && singleCommitData.commit.message}</h4>
         {
           commitsFetching
             ? <p>Loading commits</p>
-            : !_.isEmpty(singleCommitData)
+            : !_.isEmpty(singleCommitData) && !_.isEmpty(singleCommitData.files)
               ? <div className="monospace">
                 {singleCommitData.files.map(file =>
                   { 
-                    const patch = file.patch.replace(/ /g, '\u00a0').split('\n')
+                    const patch = (file.patch || '').replace(/ /g, '\u00a0').split('\n')
                     console.log(patch, 'file')
-                    return (<div key={file.sha}>
-                      <h5>{file.filename}</h5>
-                      <div>
-                        {patch.map((line, i) =>
-                          <p
-                            key={`${file.filename}line${i}`}
-                            style={{ background: this.styleCodeLine(line[0]) }}
-                            className="codeline"
-                          >
-                            {line}
-                          </p>
-                        )}
+                    return (
+                      <div key={file.sha} className="singleFileContainer">
+                        <h5>{file.filename}</h5>
+                        { file.previous_filename && <p className="prev-filename">{`Previous filename: ${file.previous_filename}`}</p>}
+                        <div>
+                          {patch.map((line, i) =>
+                            <p
+                              key={`${file.filename}line${i}`}
+                              style={{ background: this.styleCodeLine(line[0]) }}
+                              className="codeline"
+                            >
+                              {line}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )
+                  }
                 )}
               </div>
-              : <p>No commits data</p>
+              : <p>Nothing to show</p>
         }
       </div>
     );

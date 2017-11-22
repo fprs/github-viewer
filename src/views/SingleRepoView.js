@@ -62,35 +62,41 @@ class SingleRepoView extends Component {
     console.log(repoData, commitsData, match, 'singlerepo')
     return (
       <div className="SingleRepoView">
-        <div className="repoInfo">
+        <section className="repoInfo">
+          <h4>Basic info:</h4>
           {
             repoFetching
               ? <p>Loading repository info</p>
               : !_.isEmpty(repoData)
-                ? <p>{repoData.name}</p>
+                ? <div>
+                  <p>{repoData.name}</p>
+                  <p>{repoData.description || 'No description.'}</p>
+                </div>
                 : <p>No repository info</p>
           }
-        </div>
-        <div className="commitsList">
+        </section>
+        <section className="commitsList">
+          <h4>Commits:</h4>
           {
             commitsFetching
               ? <p>Loading commits</p>
               : !_.isEmpty(commitsData)
-                ? <div><ul>
-                  {
-                    commitsData.map(commit =>
-                      <li key={commit.id}>
-                        <Link to={{
-                          pathname: `${match.url}/${commit.sha}`,
-                          state: { commit }
-                        }}>{commit.commit.message}</Link>
-                      </li>
-                  )}
+                ? <div>
+                  <ul>
+                    {
+                      commitsData.map(commit =>
+                        <li key={commit.sha}>
+                          <Link to={{
+                            pathname: `${match.url}/${commit.sha}`,
+                            state: { commit }
+                          }}>{commit.commit.message}</Link>
+                        </li>
+                    )}
                   </ul>
                 </div>
-                : <p>No commits data</p>
+                : <p>No commits.</p>
           }
-        </div>
+        </section>
       </div>
     );
   }

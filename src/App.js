@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom'
 
 import MainView from './views/MainView'
+import RepoView from './views/RepoView'
 import SingleRepoView from './views/SingleRepoView'
 import SingleCommitView from './views/SingleCommitView'
 
@@ -18,8 +19,9 @@ class App extends Component {
           <Switch>
             <Route path="/repos/:topicId/:commitId" component={SingleCommitView}/>
             <Route path="/repos/:topicId" component={SingleRepoView}/>
-            <Route path="/repos" component={MainView}/>
-            <Redirect from="/" to="/repos"/>
+            <Route path="/repos" component={RepoView}/>
+            <Route path="/" component={MainView}/>
+            {/*<Redirect from="/" to="/repos"/>*/}
           </Switch>
         </div>
       </Router>
