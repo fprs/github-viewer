@@ -28,7 +28,7 @@ class RepoView extends Component {
   componentDidMount () {
     axios.get('https://api.github.com/user/repos', { headers: { Authorization: 'bearer 35205773164c8e6d20184bc7f898ebf3f3f907e6' } })
       .then(res => this.setState({ userRepositories: { data: res.data, downloaded: true, fetching: false } }))
-      .catch(error => this.setState({ error, fetching: false }))
+      .catch(error => this.setState({ userRepositories: { error, fetching: false } }))
   }
   render () {
     const {
