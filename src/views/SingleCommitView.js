@@ -1,7 +1,4 @@
-import React, { Component } from 'react';
-import {
-  // Link,
-} from 'react-router-dom'
+import React, { Component } from 'react'
 import _ from 'lodash'
 import axios from 'axios'
 
@@ -10,7 +7,7 @@ import '../App.css'
 class SingleCommitView extends Component {
   constructor (props) {
     super(props)
-    const commit = _.get(props, ['location','state','commit'])
+    const commit = _.get(props, 'location.state.commit')
     this.state = {
       singleCommitData: {
         data: commit || [],
@@ -30,13 +27,19 @@ class SingleCommitView extends Component {
     })
   }
   componentDidMount () {
-    console.log(this.props, 'aaa')
-    const { topicId, commitId } = this.props.match.params
+    const { singleCommitData } = this.state
+    const { topicId = '', commitId } = _.get(this, 'props.match.params') || {}
     const [username, ...rest] = topicId.split('-')
     const projectname = rest.join('-')
-    axios.get(`https://api.github.com/repos/${username}/${projectname}/commits/${commitId}`, { headers: { Authorization: 'bearer 35205773164c8e6d20184bc7f898ebf3f3f907e6' } })
-      .then(res => this.setState({ singleCommitData: { data: res.data, downloaded: true, fetching: false } }))
-      .catch(error => this.setState({ singleCommitData: { error, fetching: false } }))
+    axios.get(
+        `https://api.github.com/repos/${username}/${projectname}/commits/${commitId}`,
+        (window.sessionStorage && { headers: { Authorization: `token ${window.sessionStorage.getItem('token')}` } })
+      )
+      .then(res => this.setState({ singleCommitData: { ...singleCommitData, data: res.data, downloaded: true, fetching: false } }))
+      .catch(error => {
+        this.setState({ singleCommitData: { ...singleCommitData, error, fetching: false } })
+        this.props.history.push('/')
+      })
   }
   styleCodeLine (firstChar) {
     if (firstChar === '+') return '#dfd'
@@ -44,16 +47,10 @@ class SingleCommitView extends Component {
     return 'none'
   }
   render () {
-    const {
-        props: { match },
-        state: {
-          singleCommitData: { fetching: commitsFetching, data: singleCommitData }
-        }
-    } = this
-    console.log(singleCommitData, match, 'singlerepo')
+    const { fetching: commitsFetching, data: singleCommitData } = this.state.singleCommitData
     return (
       <div className="SingleCommitView">
-        <h4>{singleCommitData && singleCommitData.commit && singleCommitData.commit.message}</h4>
+        <h4>{_.get(singleCommitData, 'commit.message')}</h4>
         {
           commitsFetching
             ? <p>Loading commits</p>
@@ -61,8 +58,7 @@ class SingleCommitView extends Component {
               ? <div className="monospace">
                 {singleCommitData.files.map(file =>
                   { 
-                    const patch = (file.patch || '').replace(/ /g, '\u00a0').split('\n')
-                    console.log(patch, 'file')
+                    const patch = (file.patch || '').replace(/ /g, '\u2003').split('\n')
                     return (
                       <div key={file.sha} className="singleFileContainer">
                         <h5>{file.filename}</h5>
@@ -86,8 +82,8 @@ class SingleCommitView extends Component {
               : <p>Nothing to show</p>
         }
       </div>
-    );
+    )
   }
 }
 
-export default SingleCommitView;
+export default SingleCommitView

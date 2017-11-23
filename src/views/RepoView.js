@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
   Link
 } from 'react-router-dom'
@@ -26,9 +26,16 @@ class RepoView extends Component {
     })
   }
   componentDidMount () {
-    axios.get('https://api.github.com/user/repos', { headers: { Authorization: 'bearer 35205773164c8e6d20184bc7f898ebf3f3f907e6' } })
-      .then(res => this.setState({ userRepositories: { data: res.data, downloaded: true, fetching: false } }))
-      .catch(error => this.setState({ userRepositories: { error, fetching: false } }))
+    const { userRepositories } = this.state
+    axios.get(
+        'https://api.github.com/user/repos',
+        (window.sessionStorage && { headers: { Authorization: `token ${window.sessionStorage.getItem('token')}` } })
+      )
+      .then(res => this.setState({ userRepositories: { ...userRepositories, data: res.data, downloaded: true, fetching: false } }))
+      .catch(error => {
+        this.setState({ userRepositories: { ...userRepositories, error, fetching: false } })
+        this.props.history.push('/')
+      })
   }
   render () {
     const {
@@ -38,26 +45,29 @@ class RepoView extends Component {
     return (
       <div className="RepoView">
         <p>Click a repo to get more information</p>
-        { fetching
-          ? <p>Loading</p>
-          : data.length
-            ? <div><ul>
-              {
-                data.map(repo =>
-                  <li key={repo.id}>
-                    <Link to={{
-                      pathname: `${match.path}/${repo.owner.login}-${repo.name}`,
-                      state: { repo }
-                    }}>{repo.name}</Link>
-                  </li>
-              )}
-              </ul>
-            </div>
-            : <p>No data</p>
+        { 
+          fetching
+            ? <p>Loading</p>
+            : data.length
+              ? <div>
+                <ul>
+                  {
+                    data.map(repo =>
+                      <li key={repo.id}>
+                        <Link to={{
+                          pathname: `${match.path}/${repo.owner.login}-${repo.name}`,
+                          state: { repo }
+                        }}>{repo.name}</Link>
+                      </li>
+                    )
+                  }
+                </ul>
+              </div>
+              : <p>No data</p>
         }
       </div>
-    );
+    )
   }
 }
 
-export default RepoView;
+export default RepoView

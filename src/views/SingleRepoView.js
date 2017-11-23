@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
   Link,
 } from 'react-router-dom'
@@ -9,8 +9,7 @@ import axios from 'axios'
 class SingleRepoView extends Component {
   constructor (props) {
     super(props)
-    console.log(props, 'constructor')
-    const repo = _.get(props, ['location','state','repo'])
+    const repo = _.get(props, 'location.state.repo')
     this.state = {
       repoData: {
         data: repo || [],
@@ -40,16 +39,28 @@ class SingleRepoView extends Component {
     })
   }
   componentDidMount () {
-    console.log(this.props, 'aaa')
-    const { props: { match: { params: { topicId } } }, state: { repoData: { downloaded: isRepoDownloaded } } } = this
+    const { repoData: { downloaded: isRepoDownloaded }, repoData, commitsData } = this.state
+    const { topicId = '' } = _.get(this, 'props.match.params') || {}
     const [username, ...rest] = topicId.split('-')
     const projectname = rest.join('-')
-    !isRepoDownloaded && axios.get(`https://api.github.com/repos/${username}/${projectname}`, { headers: { Authorization: 'bearer 35205773164c8e6d20184bc7f898ebf3f3f907e6' } })
-      .then(res => this.setState({ repoData: { data: res.data, downloaded: true, fetching: false } }))
-      .catch(error => this.setState({ repoData: { error, fetching: false } }))
-    axios.get(`https://api.github.com/repos/${username}/${projectname}/commits`, { headers: { Authorization: 'bearer 35205773164c8e6d20184bc7f898ebf3f3f907e6' } })
-      .then(res => this.setState({ commitsData: { data: res.data, downloaded: true, fetching: false } }))
-      .catch(error => this.setState({ commitsData: { error, fetching: false } }))
+    !isRepoDownloaded && axios.get(
+        `https://api.github.com/repos/${username}/${projectname}`,
+        (window.sessionStorage && { headers: { Authorization: `token ${window.sessionStorage.getItem('token')}` } })
+      )
+      .then(res => this.setState({ repoData: { ...repoData, data: res.data, downloaded: true, fetching: false } }))
+      .catch(error => {
+        this.setState({ repoData: { ...repoData, error, fetching: false } })
+        this.props.history.push('/')
+      })
+    axios.get(
+        `https://api.github.com/repos/${username}/${projectname}/commits`,
+        (window.sessionStorage && { headers: { Authorization: `token ${window.sessionStorage.getItem('token')}` } })
+      )
+      .then(res => this.setState({ commitsData: { ...commitsData, data: res.data, downloaded: true, fetching: false } }))
+      .catch(error => {
+        this.setState({ commitsData: { ...commitsData, error, fetching: false } })
+        this.props.history.push('/')
+      })
   }
   render () {
     const {
@@ -59,24 +70,23 @@ class SingleRepoView extends Component {
           commitsData: { fetching: commitsFetching, data: commitsData }
         }
     } = this
-    console.log(repoData, commitsData, match, 'singlerepo')
     return (
       <div className="SingleRepoView">
         <section className="repoInfo">
-          <h4>Basic info:</h4>
+          <h4>Basic info</h4>
           {
             repoFetching
               ? <p>Loading repository info</p>
               : !_.isEmpty(repoData)
                 ? <div>
-                  <p>{repoData.name}</p>
-                  <p>{repoData.description || 'No description.'}</p>
+                  <p>Name: {repoData.name}</p>
+                  <p>Description: {repoData.description || 'No description.'}</p>
                 </div>
                 : <p>No repository info</p>
           }
         </section>
         <section className="commitsList">
-          <h4>Commits:</h4>
+          <h4>Commits</h4>
           {
             commitsFetching
               ? <p>Loading commits</p>
@@ -98,8 +108,8 @@ class SingleRepoView extends Component {
           }
         </section>
       </div>
-    );
+    )
   }
 }
 
-export default SingleRepoView;
+export default SingleRepoView

@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
   BrowserRouter as Router,
   Route,
-  Switch,
-  Redirect
+  Switch
 } from 'react-router-dom'
 
 import MainView from './views/MainView'
@@ -21,7 +20,6 @@ class App extends Component {
             <Route path="/repos/:topicId" component={SingleRepoView}/>
             <Route path="/repos" component={RepoView}/>
             <Route path="/" component={MainView}/>
-            {/*<Redirect from="/" to="/repos"/>*/}
           </Switch>
         </div>
       </Router>
@@ -29,4 +27,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default App
