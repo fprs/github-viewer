@@ -13,7 +13,7 @@ Install dependencies
 npm install or yarn install
 ```
 
-Strt project
+Start project
 
 ```
 npm start or yarn start
