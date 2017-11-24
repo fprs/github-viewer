@@ -40,16 +40,16 @@ class RepoView extends Component {
   render () {
     const {
         props: { match },
-        state: { userRepositories: { data, fetching } }
+        state: { userRepositories: { data, fetching, downloaded, error } }
     } = this
     return (
       <div className="RepoView">
         <p>Click a repo to get more information</p>
-        { 
-          fetching
-            ? <p>Loading</p>
+        {
+          fetching || (!downloaded && !error)
+            ? <p className="loading">Loading</p>
             : data.length
-              ? <div>
+              ? <div className="repoList">
                 <ul>
                   {
                     data.map(repo =>
@@ -63,7 +63,7 @@ class RepoView extends Component {
                   }
                 </ul>
               </div>
-              : <p>No data</p>
+              : <p className="noData">No data</p>
         }
       </div>
     )

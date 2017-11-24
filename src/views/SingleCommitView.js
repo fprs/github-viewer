@@ -47,13 +47,13 @@ class SingleCommitView extends Component {
     return 'none'
   }
   render () {
-    const { fetching: commitsFetching, data: singleCommitData } = this.state.singleCommitData
+    const { fetching: commitsFetching, data: singleCommitData, downloaded, error } = this.state.singleCommitData
     return (
       <div className="SingleCommitView">
         <h4>{_.get(singleCommitData, 'commit.message')}</h4>
         {
-          commitsFetching
-            ? <p>Loading commits</p>
+          commitsFetching || (!downloaded && !error)
+            ? <p className="loading">Loading commits</p>
             : !_.isEmpty(singleCommitData) && !_.isEmpty(singleCommitData.files)
               ? <div className="monospace">
                 {singleCommitData.files.map(file =>
@@ -79,7 +79,7 @@ class SingleCommitView extends Component {
                   }
                 )}
               </div>
-              : <p>Nothing to show</p>
+              : <p className="noData">Nothing to show</p>
         }
       </div>
     )

@@ -12,7 +12,7 @@ class SingleRepoView extends Component {
     const repo = _.get(props, 'location.state.repo')
     this.state = {
       repoData: {
-        data: repo || [],
+        data: repo || {},
         downloaded: !!repo,
         fetching: false,
         error: false
@@ -66,8 +66,8 @@ class SingleRepoView extends Component {
     const {
         props: { match },
         state: {
-          repoData: { fetching: repoFetching, data: repoData },
-          commitsData: { fetching: commitsFetching, data: commitsData }
+          repoData: { fetching: repoFetching, downloaded: repoDownloaded, error: repoError, data: repoData },
+          commitsData: { fetching: commitsFetching, downloaded: commitsDownloaded, error: commitsError, data: commitsData }
         }
     } = this
     return (
@@ -75,23 +75,23 @@ class SingleRepoView extends Component {
         <section className="repoInfo">
           <h4>Basic info</h4>
           {
-            repoFetching
-              ? <p>Loading repository info</p>
+            repoFetching || (!repoDownloaded && !repoError)
+              ? <p className="infoLoading" >Loading repository info</p>
               : !_.isEmpty(repoData)
-                ? <div>
+                ? <div className="basicInfo">
                   <p>Name: {repoData.name}</p>
                   <p>Description: {repoData.description || 'No description.'}</p>
                 </div>
-                : <p>No repository info</p>
+                : <p className="noInfo">No repository info</p>
           }
         </section>
         <section className="commitsList">
           <h4>Commits</h4>
           {
-            commitsFetching
-              ? <p>Loading commits</p>
+            commitsFetching || (!commitsDownloaded && !commitsError)
+              ? <p className="commitsLoading">Loading commits</p>
               : !_.isEmpty(commitsData)
-                ? <div>
+                ? <div className="commitsInfo">
                   <ul>
                     {
                       commitsData.map(commit =>
@@ -104,7 +104,7 @@ class SingleRepoView extends Component {
                     )}
                   </ul>
                 </div>
-                : <p>No commits.</p>
+                : <p className="noCommits">No commits.</p>
           }
         </section>
       </div>

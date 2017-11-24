@@ -64,13 +64,13 @@ class MainView extends Component {
       <div className="MainView">
         {
           fetching || (!downloaded && !error)
-            ? <p>Loading</p>
+            ? <p className="loading">Loading</p>
             : _.isEmpty(userData)
-              ? <div>
+              ? <div className="unauthorized">
                 <p>Login to see details of your GitHub account.</p>
                 <button onClick={() => this.openWindow(`https://github.com/login/oauth/authorize?client_id=${this.clientId}`)}>Login</button>
               </div>
-              : <div>
+              : <div className="authorized">
                 <p>Hello, {userData.login}</p>
                 <button onClick={() => this.props.history.push('/repos')}>Show list of my repos</button>
               </div>
